@@ -1,0 +1,38 @@
+# Python Virtual Environments & Caches
+venv/
+.venv/
+env/
+ENV/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Environment Variables & Credentials
+.env
+.env.*
+*.pem
+*.key
+
+# Node & Frontend Build Artifacts
+node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/node_modules/
+dist/
+build/
+*.egg-info/
+
+# IDE & Editor Settings
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs & Temporary Files
+*.log
+.gemini/
+scratch/

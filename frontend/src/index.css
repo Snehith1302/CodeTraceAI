@@ -1,0 +1,84 @@
+@import "tailwindcss";
+@import "@xyflow/react/dist/style.css";
+
+:root {
+  color-scheme: dark;
+  --bg-canvas: #0B0D12;
+  --bg-surface: #151821;
+  --bg-card: #1C202B;
+  --border-subtle: #262A36;
+  --border-glow: #7C3AED;
+  --accent-cyan: #22D3EE;
+  --accent-violet: #7C3AED;
+  --accent-amber: #F59E0B;
+  --text-primary: #E5E7EB;
+  --text-secondary: #9CA3AF;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow: hidden;
+}
+
+/* Monospace font utility for code elements */
+.font-code {
+  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* ReactFlow dark mode canvas custom overrides */
+.react-flow__controls {
+  background: #151821 !important;
+  border: 1px solid #262A36 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+}
+
+.react-flow__controls-button {
+  background: #151821 !important;
+  border-bottom: 1px solid #262A36 !important;
+  fill: #9CA3AF !important;
+  color: #9CA3AF !important;
+}
+
+.react-flow__controls-button:hover {
+  background: #232836 !important;
+  fill: #22D3EE !important;
+  color: #22D3EE !important;
+}
+
+.react-flow__minimap {
+  background: #151821 !important;
+  border: 1px solid #262A36 !important;
+  border-radius: 8px !important;
+}
+
+.react-flow__minimap-node {
+  fill: #2A2F3C !important;
+}
+
+.react-flow__attribution {
+  background: transparent !important;
+  color: #4B5265 !important;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0B0D12;
+}
+::-webkit-scrollbar-thumb {
+  background: #262A36;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3A4153;
+}
