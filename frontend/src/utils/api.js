@@ -1,20 +1,28 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  import.meta.env.VITE_API_URL ||
+  '/api';
 
 const client = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 30000,
+  timeout: 45000,
 });
 
-// Fallback to direct backend URL if proxy fails or in standalone mode
+// Fallback to direct local backend URL if local proxy fails in local dev environment
 client.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.code === 'ERR_NETWORK' && !client.defaults.baseURL.startsWith('http')) {
+    if (
+      error.code === 'ERR_NETWORK' &&
+      !client.defaults.baseURL.startsWith('http') &&
+      typeof window !== 'undefined' &&
+      window.location.hostname === 'localhost'
+    ) {
       client.defaults.baseURL = 'http://localhost:8000';
       error.config.baseURL = 'http://localhost:8000';
       return client.request(error.config);

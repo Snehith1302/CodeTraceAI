@@ -221,10 +221,11 @@ export default function GraphCanvas({
             Ready to Analyze Codebase
           </h2>
           <p className="text-xs text-[#9CA3AF] leading-relaxed mb-6">
-            Enter a local Python project folder path in the top bar to scan AST function calls, construct a dependency graph, and trace blast radiuses.
+            Enter a public GitHub repository URL or local Python folder path in the top bar to scan AST function calls, construct a dependency graph, and trace blast radiuses.
           </p>
-          <div className="p-3 bg-[#0B0D12] rounded border border-[#262A36] text-[11px] font-mono text-[#22D3EE] text-left mb-2">
-            Example: <span className="text-[#9CA3AF]">C:\path\to\CodeTrace AI\backend\tests\sample_project</span>
+          <div className="p-3 bg-[#0B0D12] rounded border border-[#262A36] text-[11px] font-mono text-[#22D3EE] text-left mb-2 space-y-1">
+            <div>GitHub URL: <span className="text-[#9CA3AF]">https://github.com/Snehith1302/CodeTraceAI</span></div>
+            <div>Local Path: <span className="text-[#9CA3AF]">C:\path\to\project\backend</span></div>
           </div>
         </div>
       </div>

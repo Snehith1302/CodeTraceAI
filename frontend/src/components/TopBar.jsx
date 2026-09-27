@@ -52,7 +52,7 @@ export default function TopBar({
             type="text"
             value={inputPath}
             onChange={(e) => setInputPath(e.target.value)}
-            placeholder="Enter absolute local folder path (e.g. C:\project\backend)..."
+            placeholder="Enter GitHub URL (e.g. https://github.com/user/repo) or local path..."
             className="w-full h-9 pl-9 pr-3 bg-[#0B0D12] border border-[#262A36] focus:border-[#7C3AED] focus:outline-none text-xs font-mono text-[#E5E7EB] rounded-md transition-colors placeholder:text-[#6B7280]"
           />
         </div>
