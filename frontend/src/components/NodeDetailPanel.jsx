@@ -142,7 +142,30 @@ export default function NodeDetailPanel({
           ) : impactData.explanation_status ? (
             <div className="bg-[#1C202B] p-3 rounded-lg border border-[#262A36] text-[11px] text-[#9CA3AF] flex items-start gap-2 font-mono">
               <Sparkles className="w-3.5 h-3.5 text-[#6B7280] shrink-0 mt-0.5" />
-              <span>{impactData.explanation_status}</span>
+              <span>
+                {(() => {
+                  const status = impactData.explanation_status;
+                  const lower = String(status).toLowerCase();
+                  if (
+                    lower.includes('credit') ||
+                    lower.includes('billing') ||
+                    lower.includes('balance') ||
+                    lower.includes('quota') ||
+                    lower.includes('insufficient') ||
+                    lower.includes('402')
+                  ) {
+                    return 'AI explanation temporarily unavailable. Deterministic impact analysis is still active.';
+                  }
+                  if (
+                    lower.includes('req_') ||
+                    lower.includes('invalid_request_error') ||
+                    lower.includes('anthropic api error:')
+                  ) {
+                    return 'AI explanation unavailable (Anthropic API error). Deterministic impact analysis is active.';
+                  }
+                  return status;
+                })()}
+              </span>
             </div>
           ) : null
         )}

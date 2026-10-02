@@ -94,7 +94,20 @@ export function useGraphData() {
         const impactRes = await fetchImpact(nodeId, projectId);
         setImpactData(impactRes);
       } catch (err) {
-        const msg = err.response?.data?.detail || err.message || 'Failed to analyze function impact.';
+        let msg = err.response?.data?.detail || err.message || 'Failed to analyze function impact.';
+        const lower = String(msg).toLowerCase();
+        if (
+          lower.includes('credit') ||
+          lower.includes('billing') ||
+          lower.includes('balance') ||
+          lower.includes('quota') ||
+          lower.includes('insufficient') ||
+          lower.includes('req_') ||
+          lower.includes('invalid_request_error') ||
+          lower.includes('anthropic')
+        ) {
+          msg = 'AI explanation temporarily unavailable. Deterministic impact analysis is still active.';
+        }
         setImpactError(msg);
       } finally {
         setIsImpactLoading(false);

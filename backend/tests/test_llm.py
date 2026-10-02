@@ -131,6 +131,35 @@ def test_generate_impact_explanation_api_error():
 
         assert explanation is None
         assert "unavailable" in status_msg.lower()
+        assert "req_" not in status_msg
+        assert "authentication_error" not in status_msg
+
+def test_generate_impact_explanation_billing_credit_error():
+    target_func = {"name": "validate_card", "file": "utils/helpers.py", "line_number": 1}
+
+    mock_billing_error = APIError(
+        message="Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing.'}, 'request_id': 'req_01ABC123'}",
+        request=MagicMock(),
+        body={"error": {"type": "invalid_request_error", "message": "Your credit balance is too low to access the Anthropic API."}}
+    )
+
+    with patch("app.llm.explainer.Anthropic") as MockAnthropic:
+        mock_client = MagicMock()
+        mock_client.messages.create.side_effect = mock_billing_error
+        MockAnthropic.return_value = mock_client
+
+        explanation, status_msg = generate_impact_explanation(
+            target_function_id="utils.helpers.validate_card",
+            target_function=target_func,
+            dependents=[],
+            total_dependents=0,
+            api_key_override="sk-ant-test-key",
+        )
+
+        assert explanation is None
+        assert status_msg == "AI explanation temporarily unavailable. Deterministic impact analysis is still active."
+        assert "req_01ABC123" not in status_msg
+        assert "invalid_request_error" not in status_msg
 
 def test_impact_endpoint_returns_deterministic_data_when_llm_fails(sample_project_path):
     ingest_res = client.post("/ingest", json={"path": sample_project_path})
@@ -148,3 +177,5 @@ def test_impact_endpoint_returns_deterministic_data_when_llm_fails(sample_projec
     assert data["explanation"] is None
     assert "explanation_status" in data
     assert "unavailable" in data["explanation_status"].lower()
+    assert "req_" not in data["explanation_status"]
+

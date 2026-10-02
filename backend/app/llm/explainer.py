@@ -66,14 +66,18 @@ def generate_impact_explanation(
 
     except APIError as e:
         logger.error(f"Anthropic API error: {e}")
-        error_msg = getattr(e, "message", str(e))
-        return (
-            None,
-            f"AI explanation unavailable (Anthropic API error: {error_msg}). Deterministic impact analysis is active."
-        )
+        err_msg = getattr(e, "message", "") or str(e)
+        err_str = (str(e) + " " + str(err_msg)).lower()
+        if any(kw in err_str for kw in ["credit", "billing", "balance", "quota", "payment", "402", "insufficient"]):
+            status_msg = "AI explanation temporarily unavailable. Deterministic impact analysis is still active."
+        else:
+            status_msg = "AI explanation unavailable (Anthropic API error). Deterministic impact analysis is active."
+        return (None, status_msg)
     except Exception as e:
         logger.error(f"Unexpected error in LLM explanation service: {e}")
-        return (
-            None,
-            f"AI explanation unavailable ({str(e)}). Deterministic impact analysis is active."
-        )
+        err_str = str(e).lower()
+        if any(kw in err_str for kw in ["credit", "billing", "balance", "quota", "payment", "402", "insufficient"]):
+            status_msg = "AI explanation temporarily unavailable. Deterministic impact analysis is still active."
+        else:
+            status_msg = "AI explanation unavailable. Deterministic impact analysis is active."
+        return (None, status_msg)
