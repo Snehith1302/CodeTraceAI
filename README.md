@@ -139,13 +139,8 @@ npm run build
 ```
 
 ## Production
-- Live Demo: [Insert Live Demo Link Here]
-- GitHub Repository: [Insert GitHub Repository Link Here]
+- Live Demo: https://code-trace-ai-delta.vercel.app/
 
-## Screenshots
-[Insert Screenshot 1: IDE Layout & Repository Graph]
-[Insert Screenshot 2: Impact Analysis & Blast Radius Inspector]
-[Insert Screenshot 3: AI Impact Synthesis & Fallback Handling]
 
 ## Future Improvements
 - Support for additional programming languages (e.g. JavaScript/TypeScript, Go, Java via Tree-sitter).
