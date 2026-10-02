@@ -1,49 +1,69 @@
 import React, { useState, useMemo } from 'react';
-import { ChevronRight, ChevronDown, FileText, Code2, PanelLeftClose, PanelLeftOpen, Search } from 'lucide-react';
+import {
+  ChevronRight,
+  ChevronDown,
+  Folder,
+  FolderOpen,
+  FileCode,
+  Code2,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Search,
+  Filter,
+} from 'lucide-react';
+
+// Utility to build directory & file tree structure from flat nodes array
+function buildTreeFromNodes(nodes, filterText) {
+  if (!nodes || nodes.length === 0) return [];
+
+  const lowerFilter = (filterText || '').toLowerCase().trim();
+
+  // Filter nodes first
+  const filteredNodes = nodes.filter((node) => {
+    if (!lowerFilter) return true;
+    return (
+      node.name.toLowerCase().includes(lowerFilter) ||
+      node.file.toLowerCase().includes(lowerFilter) ||
+      (node.class_name && node.class_name.toLowerCase().includes(lowerFilter))
+    );
+  });
+
+  // Group by file path
+  const fileGroups = {};
+  filteredNodes.forEach((node) => {
+    const file = node.file || 'root';
+    if (!fileGroups[file]) {
+      fileGroups[file] = [];
+    }
+    fileGroups[file].push(node);
+  });
+
+  return fileGroups;
+}
 
 export default function LeftRail({ rawNodes, selectedNodeId, onSelectNode }) {
   const [collapsed, setCollapsed] = useState(false);
   const [filterText, setFilterText] = useState('');
-  const [openFiles, setOpenFiles] = useState({});
+  const [collapsedFiles, setCollapsedFiles] = useState({});
 
-  // Group nodes by file path
-  const groupedFiles = useMemo(() => {
-    if (!rawNodes) return {};
-    const filtered = rawNodes.filter((node) => {
-      if (!filterText) return true;
-      const q = filterText.toLowerCase();
-      return (
-        node.name.toLowerCase().includes(q) ||
-        node.file.toLowerCase().includes(q) ||
-        (node.class_name && node.class_name.toLowerCase().includes(q))
-      );
-    });
-
-    const groups = {};
-    filtered.forEach((node) => {
-      const file = node.file || 'root';
-      if (!groups[file]) {
-        groups[file] = [];
-      }
-      groups[file].push(node);
-    });
-    return groups;
+  const fileGroups = useMemo(() => {
+    return buildTreeFromNodes(rawNodes, filterText);
   }, [rawNodes, filterText]);
 
   const toggleFile = (file) => {
-    setOpenFiles((prev) => ({
+    setCollapsedFiles((prev) => ({
       ...prev,
-      [file]: prev[file] === undefined ? false : !prev[file],
+      [file]: !prev[file],
     }));
   };
 
   if (collapsed) {
     return (
-      <div className="w-12 bg-[#151821] border-r border-[#262A36] flex flex-col items-center py-3 select-none z-10 shrink-0">
+      <div className="w-10 bg-[#161B22] border-r border-[#30363D] flex flex-col items-center py-2 select-none z-10 shrink-0">
         <button
           onClick={() => setCollapsed(false)}
-          title="Expand left rail"
-          className="p-2 text-[#9CA3AF] hover:text-white rounded hover:bg-[#232836] transition-colors"
+          title="Expand Explorer"
+          className="p-1.5 text-[#8B949E] hover:text-[#F0F6FC] rounded hover:bg-[#21262D] transition-colors"
         >
           <PanelLeftOpen className="w-4 h-4" />
         </button>
@@ -51,91 +71,100 @@ export default function LeftRail({ rawNodes, selectedNodeId, onSelectNode }) {
     );
   }
 
+  const fileList = Object.keys(fileGroups);
+
   return (
-    <aside className="w-72 bg-[#151821] border-r border-[#262A36] flex flex-col select-none z-10 shrink-0 h-full">
-      {/* Rail Header */}
-      <div className="h-10 px-3 border-b border-[#262A36] flex items-center justify-between text-xs font-semibold text-[#E5E7EB]">
-        <div className="flex items-center gap-2">
-          <FileText className="w-4 h-4 text-[#22D3EE]" />
-          <span>Project Functions</span>
+    <aside className="w-64 bg-[#161B22] border-r border-[#30363D] flex flex-col select-none z-10 shrink-0 h-full">
+      {/* Explorer Header */}
+      <div className="h-9 px-3 border-b border-[#30363D] flex items-center justify-between text-xs font-semibold text-[#8B949E] tracking-wider uppercase">
+        <div className="flex items-center gap-1.5">
+          <Folder className="w-3.5 h-3.5 text-[#38BDF8]" />
+          <span>Explorer</span>
         </div>
         <button
           onClick={() => setCollapsed(true)}
-          title="Collapse left rail"
-          className="p-1 text-[#9CA3AF] hover:text-white rounded hover:bg-[#232836] transition-colors"
+          title="Collapse Explorer"
+          className="p-1 text-[#8B949E] hover:text-[#F0F6FC] rounded hover:bg-[#21262D] transition-colors"
         >
-          <PanelLeftClose className="w-4 h-4" />
+          <PanelLeftClose className="w-3.5 h-3.5" />
         </button>
       </div>
 
-      {/* Local Filter Bar */}
-      <div className="p-2 border-b border-[#262A36]">
+      {/* Symbol Filter Input */}
+      <div className="p-2 border-b border-[#30363D]">
         <div className="relative">
-          <Search className="w-3.5 h-3.5 text-[#9CA3AF] absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Search className="w-3 h-3 text-[#6E7681] absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             value={filterText}
             onChange={(e) => setFilterText(e.target.value)}
-            placeholder="Filter files & symbols..."
-            className="w-full h-7 pl-8 pr-2 bg-[#0B0D12] border border-[#262A36] focus:border-[#7C3AED] focus:outline-none text-[11px] font-mono text-[#E5E7EB] rounded"
+            placeholder="Filter symbols..."
+            className="w-full h-6 pl-7 pr-2 bg-[#0D1117] border border-[#30363D] focus:border-[#38BDF8] focus:outline-none text-[11px] font-mono text-[#F0F6FC] rounded placeholder:text-[#6E7681]"
           />
         </div>
       </div>
 
-      {/* File Tree List */}
-      <div className="flex-1 overflow-y-auto p-2 space-y-1">
+      {/* File & Function Tree */}
+      <div className="flex-1 overflow-y-auto p-1.5 space-y-1 text-xs">
         {!rawNodes || rawNodes.length === 0 ? (
-          <div className="p-4 text-center text-xs text-[#6B7280]">
-            No project loaded. Enter a path above to scan.
+          <div className="p-4 text-center text-xs font-mono text-[#6E7681]">
+            No codebase loaded.
           </div>
-        ) : Object.keys(groupedFiles).length === 0 ? (
-          <div className="p-4 text-center text-xs text-[#6B7280]">
-            No matching functions found.
+        ) : fileList.length === 0 ? (
+          <div className="p-4 text-center text-xs font-mono text-[#6E7681]">
+            No matching symbols.
           </div>
         ) : (
-          Object.entries(groupedFiles).map(([file, nodes]) => {
-            const isOpen = openFiles[file] !== false;
+          fileList.map((file) => {
+            const nodes = fileGroups[file];
+            const isFileCollapsed = collapsedFiles[file] === true;
+
             return (
-              <div key={file} className="rounded overflow-hidden">
-                {/* File Header */}
+              <div key={file} className="space-y-0.5">
+                {/* File Header Row */}
                 <button
                   onClick={() => toggleFile(file)}
-                  className="w-full text-left px-2 py-1.5 flex items-center justify-between text-xs font-mono text-[#9CA3AF] hover:text-[#E5E7EB] hover:bg-[#1C202B] rounded transition-colors"
+                  className="w-full text-left px-1.5 py-1 flex items-center justify-between text-[11px] font-mono text-[#8B949E] hover:text-[#F0F6FC] hover:bg-[#21262D] rounded transition-colors"
                 >
                   <div className="flex items-center gap-1.5 truncate">
-                    {isOpen ? (
-                      <ChevronDown className="w-3.5 h-3.5 shrink-0 text-[#22D3EE]" />
+                    {isFileCollapsed ? (
+                      <ChevronRight className="w-3.5 h-3.5 shrink-0 text-[#6E7681]" />
                     ) : (
-                      <ChevronRight className="w-3.5 h-3.5 shrink-0 text-[#6B7280]" />
+                      <ChevronDown className="w-3.5 h-3.5 shrink-0 text-[#38BDF8]" />
                     )}
-                    <span className="truncate">{file}</span>
+                    <FileCode className="w-3.5 h-3.5 shrink-0 text-[#8B949E]" />
+                    <span className="truncate text-[#C9D1D9]">{file}</span>
                   </div>
-                  <span className="text-[10px] bg-[#0B0D12] text-[#6B7280] px-1.5 py-0.5 rounded border border-[#262A36]">
+                  <span className="text-[10px] bg-[#0D1117] text-[#6E7681] px-1 py-0.2 rounded border border-[#30363D]">
                     {nodes.length}
                   </span>
                 </button>
 
-                {/* Functions in File */}
-                {isOpen && (
-                  <div className="ml-3 pl-2 border-l border-[#262A36] my-1 space-y-0.5">
+                {/* Functions under File */}
+                {!isFileCollapsed && (
+                  <div className="ml-3 pl-1.5 border-l border-[#30363D] space-y-0.5">
                     {nodes.map((node) => {
                       const isSelected = selectedNodeId === node.id;
                       return (
                         <button
                           key={node.id}
                           onClick={() => onSelectNode(node.id)}
-                          className={`w-full text-left px-2 py-1 rounded text-xs font-code flex items-center justify-between group transition-all ${
+                          className={`w-full text-left px-2 py-1 rounded text-xs font-code flex items-center justify-between transition-all ${
                             isSelected
-                              ? 'bg-[#7C3AED]/20 text-[#22D3EE] border border-[#7C3AED]/50 font-semibold'
-                              : 'text-[#D1D5DB] hover:bg-[#1C202B] hover:text-white'
+                              ? 'bg-[#21262D] text-[#38BDF8] border-l-2 border-[#8B5CF6] font-semibold'
+                              : 'text-[#C9D1D9] hover:bg-[#21262D]/60 hover:text-[#F0F6FC]'
                           }`}
                         >
                           <div className="flex items-center gap-1.5 truncate">
-                            <Code2 className={`w-3 h-3 shrink-0 ${isSelected ? 'text-[#22D3EE]' : 'text-[#7C3AED]'}`} />
+                            <Code2
+                              className={`w-3 h-3 shrink-0 ${
+                                isSelected ? 'text-[#38BDF8]' : 'text-[#8B5CF6]'
+                              }`}
+                            />
                             <span className="truncate">{node.name}</span>
                           </div>
                           {node.class_name && (
-                            <span className="text-[9px] text-[#9CA3AF] font-sans truncate max-w-[70px]">
+                            <span className="text-[10px] text-[#6E7681] font-mono truncate max-w-[60px]">
                               {node.class_name}
                             </span>
                           )}

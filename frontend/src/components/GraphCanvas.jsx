@@ -10,7 +10,7 @@ import {
   ReactFlowProvider,
 } from '@xyflow/react';
 import CustomNode from './CustomNode';
-import { Network } from 'lucide-react';
+import { Network, Terminal, Search, RotateCcw } from 'lucide-react';
 
 const nodeTypes = {
   custom: CustomNode,
@@ -105,13 +105,13 @@ function GraphCanvasContent({
             animated: true,
             style: {
               stroke: '#F59E0B',
-              strokeWidth: 2.5,
+              strokeWidth: 2,
               opacity: 1.0,
             },
             markerEnd: {
               type: 'arrowclosed',
-              width: 14,
-              height: 14,
+              width: 12,
+              height: 12,
               color: '#F59E0B',
             },
           };
@@ -121,15 +121,15 @@ function GraphCanvasContent({
             type: 'smoothstep',
             animated: false,
             style: {
-              stroke: '#262A36',
+              stroke: '#21262D',
               strokeWidth: 1,
-              opacity: 0.1,
+              opacity: 0.15,
             },
             markerEnd: {
               type: 'arrowclosed',
-              width: 10,
-              height: 10,
-              color: '#262A36',
+              width: 8,
+              height: 8,
+              color: '#21262D',
             },
           };
         }
@@ -141,15 +141,15 @@ function GraphCanvasContent({
         type: 'smoothstep',
         animated: false,
         style: {
-          stroke: '#3A4153',
+          stroke: '#30363D',
           strokeWidth: 1.5,
-          opacity: 1.0,
+          opacity: 0.9,
         },
         markerEnd: {
           type: 'arrowclosed',
-          width: 14,
-          height: 14,
-          color: '#3A4153',
+          width: 12,
+          height: 12,
+          color: '#30363D',
         },
       };
     });
@@ -162,7 +162,7 @@ function GraphCanvasContent({
   useEffect(() => {
     if (selectedNodeId) {
       setTimeout(() => {
-        fitView({ duration: 400, padding: 0.3 });
+        fitView({ duration: 300, padding: 0.25 });
       }, 50);
     }
   }, [selectedNodeId, fitView]);
@@ -185,17 +185,17 @@ function GraphCanvasContent({
       fitView
       attributionPosition="bottom-right"
     >
-      <Background variant="dots" color="#262A36" gap={24} size={1.5} />
+      <Background variant="dots" color="#30363D" gap={20} size={1} />
       <Controls />
       <MiniMap
         nodeColor={(node) => {
           const state = node.data?.impactState;
-          if (state === 'target') return '#7C3AED';
+          if (state === 'target') return '#8B5CF6';
           if (state === 'hop1' || state === 'hop2+') return '#F59E0B';
-          if (state === 'dimmed') return '#151821';
-          return '#2A2F3C';
+          if (state === 'dimmed') return '#0D1117';
+          return '#21262D';
         }}
-        maskColor="rgba(11, 13, 18, 0.75)"
+        maskColor="rgba(13, 17, 23, 0.85)"
       />
     </ReactFlow>
   );
@@ -211,21 +211,38 @@ export default function GraphCanvas({
 }) {
   if (!initialNodes || initialNodes.length === 0) {
     return (
-      <div className="flex-1 bg-[#0B0D12] flex flex-col items-center justify-center p-6 select-none relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10 bg-[radial-[#7C3AED]_1px,transparent_1px] [background-size:24px_24px]" />
-        <div className="relative z-10 max-w-md text-center bg-[#151821] p-8 rounded-xl border border-[#262A36] shadow-2xl backdrop-blur-md">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#7C3AED]/10 border border-[#7C3AED]/30 flex items-center justify-center text-[#7C3AED] shadow-[0_0_24px_rgba(124,58,237,0.3)]">
-            <Network className="w-8 h-8" />
+      <div className="flex-1 bg-[#0D1117] flex flex-col items-center justify-center p-6 select-none relative overflow-hidden">
+        <div className="max-w-md w-full bg-[#161B22] p-6 rounded border border-[#30363D] space-y-4">
+          <div className="flex items-center gap-2 text-sm font-semibold text-[#F0F6FC] border-b border-[#30363D] pb-3">
+            <Network className="w-4 h-4 text-[#8B5CF6]" />
+            <span>Codebase Dependency Analysis</span>
           </div>
-          <h2 className="text-lg font-bold text-[#E5E7EB] mb-2">
-            Ready to Analyze Codebase
-          </h2>
-          <p className="text-xs text-[#9CA3AF] leading-relaxed mb-6">
-            Enter a public GitHub repository URL or local Python folder path in the top bar to scan AST function calls, construct a dependency graph, and trace blast radiuses.
+
+          <p className="text-xs text-[#8B949E] leading-relaxed">
+            Enter a Python repository URL or local directory path in the top bar to parse AST symbols, construct a NetworkX call graph, and trace blast radiuses.
           </p>
-          <div className="p-3 bg-[#0B0D12] rounded border border-[#262A36] text-[11px] font-mono text-[#22D3EE] text-left mb-2 space-y-1">
-            <div>GitHub URL: <span className="text-[#9CA3AF]">https://github.com/Snehith1302/CodeTraceAI</span></div>
-            <div>Local Path: <span className="text-[#9CA3AF]">C:\path\to\project\backend</span></div>
+
+          <div className="p-3 bg-[#0D1117] rounded border border-[#30363D] text-[11px] font-mono text-[#8B949E] space-y-1.5">
+            <div className="flex items-center justify-between text-[#C9D1D9]">
+              <span>Sample Repository URLs</span>
+            </div>
+            <div className="text-[#38BDF8] truncate">https://github.com/Snehith1302/CodeTraceAI</div>
+            <div className="text-[#38BDF8] truncate">C:\path\to\project\backend</div>
+          </div>
+
+          <div className="pt-2 border-t border-[#30363D] flex items-center justify-between text-[11px] font-mono text-[#6E7681]">
+            <span className="flex items-center gap-1">
+              <kbd className="px-1 py-0.2 bg-[#21262D] rounded border border-[#30363D] text-[#8B949E]">
+                /
+              </kbd>
+              Focus Search
+            </span>
+            <span className="flex items-center gap-1">
+              <kbd className="px-1 py-0.2 bg-[#21262D] rounded border border-[#30363D] text-[#8B949E]">
+                Esc
+              </kbd>
+              Clear View
+            </span>
           </div>
         </div>
       </div>
@@ -233,7 +250,7 @@ export default function GraphCanvas({
   }
 
   return (
-    <div className="flex-1 h-full bg-[#0B0D12] relative overflow-hidden">
+    <div className="flex-1 h-full bg-[#0D1117] relative overflow-hidden">
       <ReactFlowProvider>
         <GraphCanvasContent
           initialNodes={initialNodes}

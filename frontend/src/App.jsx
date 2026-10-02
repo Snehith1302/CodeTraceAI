@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import TopBar from './components/TopBar';
 import LeftRail from './components/LeftRail';
 import GraphCanvas from './components/GraphCanvas';
 import NodeDetailPanel from './components/NodeDetailPanel';
+import StatusBar from './components/StatusBar';
 import { useGraphData } from './hooks/useGraphData';
 import { AlertCircle, AlertTriangle, X } from 'lucide-react';
 
@@ -30,59 +31,79 @@ export default function App() {
     setError,
   } = useGraphData();
 
+  const searchInputRef = useRef(null);
+
+  // Global Keyboard Shortcuts (/ for search focus, Escape for clearing selection)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === '/' && document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        if (searchInputRef.current) {
+          searchInputRef.current.focus();
+        }
+      } else if (e.key === 'Escape') {
+        clearSelection();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [clearSelection]);
+
   return (
-    <div className="w-screen h-screen bg-[#0B0D12] text-[#E5E7EB] flex flex-col overflow-hidden">
-      {/* Top Header Navigation Bar */}
+    <div className="w-screen h-screen bg-[#0D1117] text-[#F0F6FC] flex flex-col overflow-hidden select-none">
+      {/* Top IDE Command Bar */}
       <TopBar
         onIngest={handleIngest}
         isIngesting={isIngesting}
         stats={stats}
-        warningsCount={warnings ? warnings.length : 0}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         projectId={projectId}
+        projectPath={projectPath}
         selectedNodeId={selectedNode ? selectedNode.id : null}
         onClearSelection={clearSelection}
+        searchInputRef={searchInputRef}
       />
 
-      {/* Non-blocking Error / Warning Banners */}
+      {/* Non-blocking Error & Warning Banners */}
       {error && (
-        <div className="bg-rose-500/15 border-b border-rose-500/30 px-4 py-2 flex items-center justify-between text-xs text-rose-300 z-30">
+        <div className="bg-[#F85149]/10 border-b border-[#F85149]/30 px-3 py-1.5 flex items-center justify-between text-xs text-[#F85149] z-30 font-mono">
           <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
             <span>{error}</span>
           </div>
           <button
             onClick={() => setError(null)}
-            className="p-1 hover:bg-rose-500/20 rounded text-rose-400 transition-colors"
+            className="p-0.5 hover:bg-[#F85149]/20 rounded text-[#F85149] transition-colors"
           >
-            <X className="w-3.5 h-3.5" />
+            <X className="w-3 h-3" />
           </button>
         </div>
       )}
 
       {warnings && warnings.length > 0 && !error && (
-        <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-1.5 flex items-center justify-between text-xs text-amber-300 z-30 font-mono">
+        <div className="bg-[#F59E0B]/10 border-b border-[#F59E0B]/20 px-3 py-1 flex items-center justify-between text-[11px] text-[#F59E0B] z-30 font-mono">
           <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+            <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
             <span>
-              Parsing Warning: {warnings.length} file(s) had syntax errors (e.g.{' '}
+              AST Parsing Warning: {warnings.length} file(s) had syntax errors (e.g.{' '}
               {warnings[0].file})
             </span>
           </div>
         </div>
       )}
 
-      {/* Main Workspace Layout */}
+      {/* Main Workspace Grid (Left Explorer | Center Graph | Right Inspector) */}
       <div className="flex-1 flex overflow-hidden relative">
-        {/* Left Rail File & Symbol Browser */}
+        {/* Left Repository & Function Explorer */}
         <LeftRail
           rawNodes={rawGraphData ? rawGraphData.nodes : []}
           selectedNodeId={selectedNode ? selectedNode.id : null}
           onSelectNode={selectNode}
         />
 
-        {/* Main Graph Visualization Canvas */}
+        {/* Center Dependency Graph Visualization */}
         <GraphCanvas
           initialNodes={nodes}
           initialEdges={edges}
@@ -92,7 +113,7 @@ export default function App() {
           searchQuery={searchQuery}
         />
 
-        {/* Right-side Node Impact Inspector Panel */}
+        {/* Right Impact Inspector Panel */}
         <NodeDetailPanel
           node={selectedNode}
           impactData={impactData}
@@ -102,6 +123,14 @@ export default function App() {
           onSelectNode={selectNode}
         />
       </div>
+
+      {/* Bottom IDE Status Bar */}
+      <StatusBar
+        projectPath={projectPath}
+        stats={stats}
+        warningsCount={warnings ? warnings.length : 0}
+        selectedNode={selectedNode}
+      />
     </div>
   );
 }
