@@ -50,7 +50,6 @@ def generate_impact_explanation(
             messages=[
                 {"role": "user", "content": user_prompt}
             ],
-            temperature=0.2,
         )
 
         explanation = ""
